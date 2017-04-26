@@ -20,9 +20,21 @@ let CHARACTERS_START_WITH = "&nameStartsWith="
 let CHARACTERS_A = "&nameStartsWith=a"
 
 typealias DownloadComplete = ([Character]) -> ()
+typealias EventDownloadComplete = ([(String,String,URL)]) -> ()
+
 let CHARACTERS_URL = "\(baseURL)characters?\(TIME_STAMP)\(CHARACTER_LIMIT)\(CHARACTERS_A)\(APP_ID)\(APIKEY)\(HASH_URL)\(MY_HASH)"
 
 //let CHARACTERS_BY_LETTER_URL = "\(baseURL)characters?\(TIME_STAMP)\(CHARACTER_LIMIT)\(CHARACTERS_START_WITH)a\(APP_ID)\(APIKEY)\(HASH_URL)\(MY_HASH)"
+
+
+//let EVENTS_URL = "http://gateway.marvel.com/v1/public/events/255"
+
+public func getEventURL(url:String) -> String {
+    let eventURL = "\(url)?\(TIME_STAMP)\(APP_ID)\(APIKEY)\(HASH_URL)\(MY_HASH)"
+    
+    return eventURL
+}
+
 
 let CHARACTERS_BY_LETTER_FIRST = "\(baseURL)characters?\(TIME_STAMP)\(CHARACTER_LIMIT)\(CHARACTERS_START_WITH)"
 let CHARACTERS_BY_LETTER_LAST = "\(APP_ID)\(APIKEY)\(HASH_URL)\(MY_HASH)"

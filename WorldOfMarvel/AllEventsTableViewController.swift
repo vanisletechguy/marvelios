@@ -11,6 +11,9 @@ import UIKit
 class AllEventsTableViewController: UITableViewController {
 
     var eventList: [(String,String)] = []
+    var selectedEvent = 0
+    
+    
     override func viewDidLoad() {
         super.viewDidLoad()
     }
@@ -30,13 +33,22 @@ class AllEventsTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "event cell", for: indexPath)
-
         cell.textLabel?.text = eventList[indexPath.row].0
         
-        print(eventList[indexPath.row].1)
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        selectedEvent = indexPath.row
+        performSegue(withIdentifier: "Event Item Segue", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let navVC = segue.destination as! UINavigationController
+        let eventVC = navVC.topViewController as! EventItemTableViewController
+        
+        eventVC.eventURL = eventList[selectedEvent].1
+    }
 
     @IBAction func backBtnClicked(_ sender: Any) {
         dismiss(animated: true, completion: nil)

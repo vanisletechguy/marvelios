@@ -135,6 +135,55 @@ class Character {
         }
         
     }
+    
+    
+    
+    static func downloadEventData(downloadURL: URL, completed: @escaping EventDownloadComplete) {
+    
+        var eventName = ""
+        var eventDescription = ""
+        var eventThumbnailURL = ""
+        var fullThumbURL = URL(string: "")
+        
+        var eventList: [(String,String,URL)] = []
+        print("TLTLTLT")
+        Alamofire.request(downloadURL).responseJSON { response in
+            let result = response.result
+            print("AAA###C")
+            if let dict = result.value as? Dictionary<String, AnyObject> {
+                print("AA$$$$")
+                if let data = dict["data"] as? Dictionary<String, AnyObject> {
+                    print("AAABBBCC")
+                    if let dataResults = data["results"] as? [Dictionary<String, AnyObject>] {
+                        print("A%%%%%")
+                        for object in dataResults {
+                            if let title = object["title"] as? String {
+                                eventName = title
+                            }
+                            if let description = object["description"] as? String {
+                                eventDescription = description
+                            }
+                            if let thumbnail = object["thumbnail"] as? Dictionary<String, AnyObject> {
+                                if let thumbPath = thumbnail["path"] as? String {
+                                    eventThumbnailURL = thumbPath
+                                    fullThumbURL = URL(string: "\(thumbPath).jpg")!
+                                    print("AAABBBCC")
+                                    print(fullThumbURL)
+                                }
+                            }
+                            
+                            eventList.append((eventName,eventDescription,fullThumbURL!))
+                            
+                        }
+                    }
+                }
+            }
+            
+            
+            completed(eventList)
+        }
+        
+    }
 }
 
 
