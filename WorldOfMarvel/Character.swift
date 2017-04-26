@@ -8,6 +8,7 @@
 
 import Foundation
 import Alamofire
+import AlamofireImage
 
 class Character {
     var _id: Int
@@ -17,6 +18,9 @@ class Character {
     var _numberOfComics: Int     //comics[available]
     var _numberOfSeries: Int     //series[available]
     var _numberOfStories: Int    //stories[available]
+    var _thumbnailImage: UIImage
+    
+    var eventList: [(String,String)] = [] ///// NAME, URI
     
     init (id:Int, name:String, description:String) {
         _id = id
@@ -26,15 +30,18 @@ class Character {
         _numberOfStories = 0
         _numberOfSeries = 0
         _numberOfComics = 0
+        _thumbnailImage = UIImage()
     }
     init(id:Int, name:String, description:String, thumbnail:String, numberOfComics:Int, numberOfSeries:Int, numberOfStories:Int) {
         _id = id
         _name = name
         _description = description
         _thumbnail = thumbnail
+        _thumbnailImage = UIImage() //empty image
         _numberOfComics = numberOfComics
         _numberOfSeries = numberOfSeries
         _numberOfStories = numberOfStories
+        
     }
     
     
@@ -45,6 +52,9 @@ class Character {
         var tmpName = ""
         var tmpID = 0
         var tmpDescription = ""
+        var tmpImage = UIImage()
+        var tmpThumbURL = ""
+        
 //        var tmpThumbnail = ""
 //        var tmpNumberOfComics = 0
 //        var tmpNumberOfSeries = 0
@@ -52,6 +62,7 @@ class Character {
         
         //let charactersURL = URL(string: CHARACTERS_URL)!
         
+        print(downloadURL)
         Alamofire.request(downloadURL).responseJSON { response in
             let result = response.result
             if let dict = result.value as? Dictionary<String, AnyObject> {
@@ -75,8 +86,38 @@ class Character {
                                     tmpDescription = ""
                                 }
                                 
+                                if let thumbnail = result["thumbnail"] as? Dictionary<String, AnyObject> {
+                                    if let thumbPath = thumbnail["path"] as? String {
+                                        let fullThumbPath = "\(thumbPath).jpg"
+                                        //let thumbURL = URL(string: fullThumbPath)!
+                                        //print(thumbURL)
+                                        tmpThumbURL = fullThumbPath
+                                        
+                                    }
+                                }
+                                
+                                var eventList: [(String,String)] = []
+                                var tmpeventName = ""
+                                var tmpeventURI = ""
+                                if let comicEvents = result["events"] as? Dictionary<String, AnyObject> {
+                                    if let eventItems = comicEvents["items"] as? [Dictionary<String, AnyObject>] {
+                                        for eventItem in eventItems {
+                                            if let eventName = eventItem["name"] as? String {
+                                                tmpeventName = eventName
+                                            }
+                                            if let resourceURI = eventItem["resourceURI"] as? String {
+                                                tmpeventURI = resourceURI
+                                            }
+                                            eventList.append((tmpeventName, tmpeventURI))
+                                        }
+                                    }
+                                }
+                                
                                 //print("\(tmpID) \(tmpName) \(tmpDescription)")
                                 let newCharacter = Character(id: tmpID, name: tmpName, description: tmpDescription)
+                                newCharacter._thumbnailImage = tmpImage
+                                newCharacter._thumbnail = tmpThumbURL
+                                newCharacter.eventList = eventList
                                 characterList.append(newCharacter)
                                 
                                 

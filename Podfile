@@ -7,4 +7,5 @@ target 'WorldOfMarvel' do
 
   # Pods for WorldOfMarvel
 	pod 'Alamofire', '~> 4.4'
+	pod 'AlamofireImage', '~> 3.1'
 end

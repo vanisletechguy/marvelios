@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import Alamofire
+import AlamofireImage
 
 class CharacterDetailTableViewController: UITableViewController {
 
@@ -14,6 +16,7 @@ class CharacterDetailTableViewController: UITableViewController {
     @IBOutlet weak var characterImage: UIImageView!
     @IBOutlet weak var characterDescriptionLabel: UITextView!
     
+    @IBOutlet weak var numberOfEventsLabel: UILabel!
     
     var currentCharacter: Character!
     
@@ -23,9 +26,24 @@ class CharacterDetailTableViewController: UITableViewController {
         characterNameLabel.text = currentCharacter._name
         characterDescriptionLabel.isEditable = false
         characterDescriptionLabel.text = currentCharacter._description
-
+        characterImage.image = currentCharacter._thumbnailImage
         print(currentCharacter._description)
-        
+        downloadPicture()
+        numberOfEventsLabel.text = "\(currentCharacter.eventList.count)"
+    }
+    
+    
+    func downloadPicture() {
+        Alamofire.request(currentCharacter._thumbnail, method: .get).responseImage { response in
+            guard let image:Image = response.result.value else {
+                // Handle error
+                return
+            }
+            // Do stuff with your image
+            if let imageData = UIImageJPEGRepresentation(image, 1) {
+                self.characterImage.image = UIImage(data: imageData)!
+            }
+        }
     }
 
 
@@ -33,6 +51,23 @@ class CharacterDetailTableViewController: UITableViewController {
         dismiss(animated: true, completion: nil)
     }
 
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if(indexPath.row == 4) {
+            print("clicked on 4")
+            performSegue(withIdentifier: "eventsSegue", sender: self)
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if(segue.identifier == "eventsSegue") {
+            let navVC = segue.destination as! UINavigationController
+            let eventsVC = navVC.topViewController as! AllEventsTableViewController
+            
+            eventsVC.eventList = currentCharacter.eventList
+        }
+    }
+    
 
 //    override func numberOfSections(in tableView: UITableView) -> Int {
 //        // #warning Incomplete implementation, return the number of sections
